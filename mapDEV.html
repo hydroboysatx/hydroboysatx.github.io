@@ -1,111 +1,158 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8"> 
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Berg - BergTheme HTML</title>
-	<meta name="description" content="">
-	<meta name="msapplication-tap-highlight" content="yes" />
-	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
-	<link href='http://fonts.googleapis.com/css?family=Cabin:400,400italic,500,600,700' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700,800&amp;subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-<!--		 Place favicon.ico and apple-touch-icon.png in the root directory -->
-	<link rel="stylesheet" href="css/custom.css">
-	<script src="js/jquery-2.1.0.min.js"></script>
-	<script src="js/modernizr-2.6.2.min.js"></script>
-    <title>Add Map</title>
+    <head>
+        <meta charset="utf-8"> 
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Berg - BergTheme HTML</title>
+        <meta name="description" content="">
+        <meta name="msapplication-tap-highlight" content="yes" />
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        <link href='http://fonts.googleapis.com/css?family=Cabin:400,400italic,500,600,700' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700,800&amp;subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+        <!--Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <link rel="stylesheet" href="css/custom.css">
+        <script src="js/jquery-2.1.0.min.js"></script>
+        <script src="js/modernizr-2.6.2.min.js"></script>
+        <title>Add Map</title>
 
-    <style type="text/css">
-      /* Set the size of the div element that contains the map */
-      #map {
-        height: 400px;
-        /* The height is 400 pixels */
-        width: 100%;
-        /* The width is the width of the web page */
-      }
-    </style>
-    <script>
-      // Initialize and add the map
-      var latitude;
-    var longitude;
-    function FindLatLong(address, callback){
-        var geocoder = new google.maps.Geocoder();
-        geocoder.geocode( { 'address': address}, function(results, status) {
+        <style type="text/css">
+        /* Set the size of the div element that contains the map */
+        #map {
+            margin-top: 75px;
+            height: 600px;
+            /* The height is 400 pixels */
+            width: 100%;
+            /* The width is the width of the web page */
+        }
+        </style>
 
-        if (status == google.maps.GeocoderStatus.OK) {
-            latitude = results[0].geometry.location.lat();
-            longitude = results[0].geometry.location.lng();
-            DannyAddy = { latitude, longitude };
-            console.log(latitude,longitude);
-            callback({ Status: "OK", Latitude: latitude, Longitude: longitude });
-            alert(latitude);
-        } 
-        }); 
-    }
-      function initMap() {
+        <!-- Logic for Map API -->
+        <script>
+        // Initialize and add the map
+            // Convert Address to Lat, Lng coordinates
+            function FindLatLong(address, callback){
+                var geocoder = new google.maps.Geocoder();
+                geocoder.geocode( { 'address': address}, function(results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        latitude = results[0].geometry.location.lat();
+                        longitude = results[0].geometry.location.lng();
+                        DannyAddy = { latitude, longitude };
+                        console.log(latitude,longitude);
+                        callback({ Status: "OK", Latitude: latitude, Longitude: longitude });
+                        alert(latitude);
+                    } 
+                }); 
+            }
+            // Initialize the map with the 2 different markers and their info windows
+            function initMap() {
+                // create location 
+                // var geocoder = new google.maps.Geocoder();
+                // var address = "4003 Red River St, Austin, TX 78751";
+                // var DannyAddy = FindLatLong(address, function(data) {});
+                // console.log("var Danny");
+                // console.log(DannyAddy);
+                var map;
+                var bounds = new google.maps.LatLngBounds();
+                var mapOptions = {
+                    mapTypeId: 'roadmap'
+                };
+                                
+                // Display a map on the page
+                map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                map.setTilt(45);
 
-        // create location 
-        var geocoder = new google.maps.Geocoder();
-        var address = "4003 Red River St, Austin, TX 78751";
+                // Collect Custom Icons
+                const iconBase =
+                    "https://maps.google.com/mapfiles/kml/paddle/";
+                const icons = {
+                    blue: {
+                    icon: iconBase + "blu-circle.png",
+                    },
+                    red: {
+                    icon: iconBase + "red-circle.png",
+                    },
+                };
 
-       var DannyAddy = FindLatLong(address, function(data) {
-                    console.log("Init data");
-                    console.log(data);
-                    DannyAddy = data;
-                    console.log("Assigned to var DannyAddy");
-                    console.log(DannyAddy);
-        });
-        console.log("var Danny");
-        console.log(DannyAddy);
-        // The location of Uluru
-        const uluru = { lat: -25.344, lng: 131.036 };
-        // The map, centered at Uluru
-        const map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 4,
-          center: uluru,
-        });
-        // The marker, positioned at Uluru
-        const marker = new google.maps.Marker({
-          position: uluru,
-          map: map,
-        });
+                // Marker's and Info Window Content
+                var markers = [
+                    ['Franklins BBQ, Austin', 30.270090, -97.731270, "red"], 
+                    ['Jew Boy Burgers, Austin', 30.312810, -97.715070, "red"], 
+                    ['Home Address, Austin', 30.298720, -97.722160, "blue"]
+                ];
 
-        const contentString =
-    '<div id="content">' +
-    '<div id="siteNotice">' +
-    "</div>" +
-    '<h1 id="firstHeading" class="firstHeading">Uluru</h1>' +
-    '<div id="bodyContent">' +
-    "<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large " +
-    "sandstone rock formation in the southern part of the " +
-    "Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) " +
-    "south west of the nearest large town, Alice Springs; 450&#160;km " +
-    "(280&#160;mi) by road. Kata Tjuta and Uluru are the two major " +
-    "features of the Uluru - Kata Tjuta National Park. Uluru is " +
-    "sacred to the Pitjantjatjara and Yankunytjatjara, the " +
-    "Aboriginal people of the area. It has many springs, waterholes, " +
-    "rock caves and ancient paintings. Uluru is listed as a World " +
-    "Heritage Site.</p>" +
-    '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
-    "https://en.wikipedia.org/w/index.php?title=Uluru</a> " +
-    "(last visited June 22, 2009).</p>" +
-    "</div>" +
-    "</div>";
-  const infowindow = new google.maps.InfoWindow({
-    content: contentString,
-  });
-  const marker1 = new google.maps.Marker({
-    position: uluru,
-    map,
-    title: "Uluru (Ayers Rock)",
-  });
-  marker1.addListener("click", () => {
-    infowindow.open(map, marker1);
-  });
-      }
-    </script>
-  </head>
-  <body class="show-nav home-page yo-anim-enabled">
+                var infoWindowContent = [
+                    ['<div id="content">' +
+                        '<div id="siteNotice">' +
+                        "</div>" +
+                        '<h1 id="firstHeading" class="firstHeading">Franklins BBQ</h1>' +
+                        '<div id="bodyContent">' +
+                            "<p><b>Dannys House</b>, also referred to as <b>the Temple</b>, is a large " +
+                            "sandstone rock formation in the southern part of the " +
+                            "Heritage Site.</p>" +
+                            '<p>Attribution: Uluru, <a href="post.html">' +
+                            "Review</a> " +
+                            "</p>" +
+                        "</div>" +
+                    "</div>"],
+                    ['<div id="content">' +
+                    '<div id="siteNotice">' +
+                    "</div>" +
+                    '<h1 id="firstHeading" class="firstHeading">Jew Boy Burgers </h1>' +
+                    '<div id="bodyContent">' +
+                    "<p><b>Jew Boy Burgers</b>, also referred to as <b>the Temple</b>, is a large " +
+                    "sandstone rock formation in the southern part of the " +
+                    "Heritage Site.</p>" +
+                    '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+                    "https://en.wikipedia.org/w/index.php?title=Uluru</a> " +
+                    "(last visited June 22, 2009).</p>" +
+                    "</div>" +
+                    "</div>"],
+                    ['<div id="content">' +
+                    '<div id="siteNotice">' +
+                    "</div>" +
+                    '<h1 id="firstHeading" class="firstHeading">Dannys Home </h1>' +
+                    '<div id="bodyContent">' +
+                    "<p><b>Dannys House</b>, also referred to as <b>the Temple</b>, is a large " +
+                    "sandstone rock formation in the southern part of the " +
+                    "Heritage Site.</p>" +
+                    '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+                    "https://en.wikipedia.org/w/index.php?title=Uluru</a> " +
+                    "(last visited June 22, 2009).</p>" +
+                    "</div>" +
+                    "</div>"],
+                ];
+
+                // Display multiple markers on a map
+                var infoWindow = new google.maps.InfoWindow(), marker, i;
+                // Loop through our array of markers & place each one on the map  
+                for( i = 0; i < markers.length; i++ ) {
+                    var position = new google.maps.LatLng(markers[i][1], markers[i][2]);
+                    bounds.extend(position);
+                    marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: markers[i][0],
+                        //icon: icons[markers[i][3]].icon
+                    });
+                    // Allow each marker to have an info window    
+                    google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                        return function() {
+                            infoWindow.setContent(infoWindowContent[i][0]);
+                            infoWindow.open(map, marker);
+                        }
+                    })(marker, i));
+                    // Automatically center the map fitting all markers on the screen
+                    map.fitBounds(bounds);
+                }
+                // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+                // var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+                //     this.setZoom(14);
+                //     google.maps.event.removeListener(boundsListener);
+                // });
+            }
+        </script>
+    </head>
+    <body class="show-nav home-page yo-anim-enabled">
     <div class="content-wrapper">
 
     <nav id="main-navbar" class="hidden-xs hidden-sm">
@@ -233,9 +280,9 @@
         </div>
     </div>
     <!--The div element for the map -->
-    
-    <div id="map"></div>
-
+    <div class='home-fullscreen'>
+        <div id="map"></div>
+    </div>
     <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
     <script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHQrUTCUzVx64ogCN_vTwQp03MSX48nRo&callback=initMap&libraries=&v=weekly"
